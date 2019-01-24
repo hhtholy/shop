@@ -1,0 +1,61 @@
+<!--
+ private org.springframework.data.domain.Page<T> page;
+
+     // 分页导航  [8,9,10,11,12]  形如这种  也就是 随着页面的添加 页码跟着变 保持几个页码
+     //  举例的 navigatePages =5
+     private Integer navigatePages;   //决定导航有多少个页码 [1,2,3,4,5,6,7] 7个
+
+
+     private int[] navigateNums; //数组 展示页码 [1,2,3,4,5,6,7]
+
+     private Integer totalPage;  //总页数
+
+     private Integer currentPage;  //当前页码
+
+     private Long totals; //总条数
+
+     private Integer size;  // 每页显示的条数
+
+     List<T> content;  // 分页的内容
+
+
+     boolean isFirst;  //是否为首页
+
+     boolean isLast;  //是否是尾页
+
+     boolean isHasNext; //是否有下页
+
+     boolean isHasPrecious; //是否有上页
+
+
+
+-->
+
+<!--
+注意下 这里的jump是绑定在 vue方法上的  只是和js函数相同而已  不要混淆
+-->
+<div class="pageDiv" th:fragment="html">
+	<nav>
+	  <ul class="pagination">
+	    <li :class="{ disabled: pagination.first }">
+	      <a  href="#nowhere" @click="jump('first')">首页</a>
+	    </li>
+	    <li :class="{ disabled: !pagination.hasPrecious }">
+	      <a  href="#nowhere" @click="jump('pre')">上一页</a>
+	    </li>		    
+
+		<li  v-for="i in pagination.navigateNums">
+			<a href="#nowhere" @click="jumpByNumber(i-1)" >
+				{{i}}
+			</a>
+		</li>
+
+	    <li :class="{ disabled: !pagination.hasNext }">
+	      <a  href="#nowhere" @click="jump('next')">下一页</a>
+	    </li>
+	    <li :class="{ disabled: pagination.last }">
+	      <a  href="#nowhere" @click="jump('last')">末页</a>
+	    </li>		    
+	  </ul>
+	</nav>    
+</div>

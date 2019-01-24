@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/admin/adminHeader::html('分类管理')" ></head>  <!--主要是引入js-->
+<body>
+<div th:replace="include/admin/adminNavigator::html" ></div> <!--这是导航页-->
+<script>
+    $(function(){
+            //定义vue的数据域
+            var data4Vue = {
+                uri:'users', /*请求url*/
+                beans: [],   //接受返回的数据  为一个数组
+                pagination:{}  //分页数据
+            };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#workingArea',
+            data: data4Vue,
+            mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
+                //其实可以理解成页面加载成功后  去调用这个方法  传递一个参数
+                this.list(0);
+            },
+            //定义的方法
+            methods: {
+                //展示数据 分页
+                list:function(currentPage){
+                    var url =  this.uri + "?currentPage="+currentPage; //传递参数
+                    //发送异步请求
+                    axios.get(url).then(function(response) {
+                        //数据分开  其实response.data 已经有列表信息了
+                        vue.beans = response.data.content;
+                        //返回的分页数据  包含分页数据和其他信息等
+                        vue.pagination = response.data;
+                    });
+                },
+                //分页导航
+                jump: function(page){
+                    jump(page,vue); //定义在adminHeader.html 中
+                },
+                jumpByNumber: function(currentPage){
+                    jumpByNumber(currentPage,vue); //定义在adminHeader.html 中
+                }
+            }
+        });
+    });
+
+</script>
+
+<div id="workingArea" >
+    <h1 class="label label-info" >用户管理</h1>
+    <br>
+    <br>
+
+    <div class="listDataTableDiv">
+        <table class="table table-striped table-bordered table-hover  table-condensed">
+            <thead>
+            <tr class="success">
+                <th>ID</th>
+                <th>用户名称</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="bean in beans ">
+                <td>{{bean.id}}</td>
+                <td>
+                    {{bean.name}}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:replace="include/admin/adminPage::html"></div>
+</div>
+<div th:replace="include/admin/adminFooter::html" ></div>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/admin/adminHeader::html('分类管理')" ></head>  <!--主要是引入js-->
+<body>
+<div th:replace="include/admin/adminNavigator::html" ></div> <!--这是导航页-->
+<script>
+    $(function(){
+
+
+        /**
+         *  //可以看成一个父组件
+         var app = new Vue({
+
+             el:"#app",
+             components:{  //注册组件到实例
+                 todoitem:todoitem
+             },
+             data:{
+                   list:[],
+                 inputValue:""
+
+             },
+             methods:{
+
+             }
+             })
+         */
+
+            //定义vue的数据域
+            var data4Vue = {
+                uri:'categories', /*请求url*/
+                beans: [],   //接受返回的数据  为一个数组
+                pagination:{},   //分页数据
+                bean: {id:0,name:""},  //添加的分类(对象)
+                file:null  //文件对象
+            };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#workingArea',
+            data: data4Vue,
+            mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
+                //其实可以理解成页面加载成功后  去调用这个方法  传递一个参数
+                this.list(0);
+            },
+            //定义的方法
+            methods: {
+                //展示数据 分页
+                list:function(currentPage){
+                    var url =  this.uri + "?currentPage="+currentPage; //传递参数
+                    //发送异步请求
+                    axios.get(url).then(function(response) {
+                        //数据分开  其实response.data 已经有列表信息了
+                        vue.beans = response.data.content;
+                        //返回的分页数据  包含分页数据和其他信息等
+                        vue.pagination = response.data;
+                    });
+                },
+                //分页导航
+                jump: function(page){
+                    jump(page,vue); //定义在adminHeader.html 中
+                },
+                jumpByNumber: function(currentPage){
+                    jumpByNumber(currentPage,vue); //定义在adminHeader.html 中
+                },
+                getFile: function (event) {
+                     this.file = event.target.files[0];  //  获取文件对象
+                },
+                add:function () {
+                if(!checkEmpty(this.bean.name,"分类名称"))
+                    return;
+                if(!checkEmpty(this.file,"分类图片"))
+                    return;
+
+                var url = this.uri;
+                //上传文件
+                var formdata = new FormData();// axios 上传文件需要使用 formData这种方式
+                formdata.append("image",this.file);
+                formdata.append("name",this.bean.name);//  类似表单添加数据
+
+                axios.post(url,formdata).then(function (response) {
+                    vue.list(0); //重新刷新界面
+                    vue.bean = {id:0,name:''}
+                    //
+                    $("#categoryPic").val(""); //图片置空
+                    vue.file = null;
+                });},
+                //删除分类
+                deleteBean:function (id) {
+                    if(!checkDeleteLink())
+                        return;
+                    var url = this.uri + "/" +id;
+                    axios.delete(url).then(function (response) {
+                        if(response.data == 'failure'){
+
+                               alert("删除失败！！");
+
+                        }else {
+
+                            vue.list(0); //重新刷新界面
+
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+</script>
+<div id="workingArea" >
+    <h1 class="label label-info" >分类管理</h1>
+    <br>
+    <br>
+    <div class="listDataTableDiv">
+        <table class="table table-striped table-bordered table-hover  table-condensed">
+            <thead>
+            <tr class="success">
+                <th>ID</th>
+                <th>图片</th>
+                <th>分类名称</th>
+                <th>属性管理</th>
+                <th>产品管理</th>
+                <th>编辑</th>
+                <th>删除</th>
+            </tr>
+            </thead>
+
+            <!--遍历 vue中的数据域-->
+
+            <!--数据 填充-->
+            <tbody>
+            <tr v-for="bean in beans ">
+                <td>{{bean.id}}</td>
+                <td>
+                    <img height="40px"  :src="'img/category/'+bean.id+'.jpg'">
+                </td>
+                <td>
+                    {{bean.name}}
+                </td>
+                <td>
+                    <a :href="'admin_property_list?cid=' + bean.id "><span class="glyphicon glyphicon-th-list"></span></a>
+                </td>
+                <td>
+                    <a :href="'admin_product_list?cid=' + bean.id "><span class="glyphicon glyphicon-shopping-cart"></span></a>
+                </td>
+                <td>
+                    <a :href="'admin_category_edit?id=' + bean.id "><span class="glyphicon glyphicon-edit"></span></a>
+                </td>
+                <td>
+                    <a href="#nowhere"  @click="deleteBean(bean.id)"><span class="   glyphicon glyphicon-trash"></span></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:replace="include/admin/adminPage::html"></div>
+<!--
+
+ -->
+    <div class="panel panel-warning addDiv">分类的添加
+        <div class="panel-heading">新增分类</div>
+        <div class="panel-body">
+            <table class="addTable">
+                <tr>
+                    <td>分类名称</td>         <!--数据双向绑定  这里只要输入了值 或者 控制台改值 都会修改-->
+                    <td><input  @keyup.enter="add" v-model.trim="bean.name" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>分类图片</td>
+                    <!--文件上传  添加 change事件
+
+                      getFile 上传文件方法
+                    -->
+                    <td>
+                        <input id="categoryPic" accept="image/*" type="file" name="image" @change="getFile($event)" />
+                    </td>
+                </tr>
+                <tr class="submitTR">
+                    <td colspan="2" align="center">
+                        <a href="#nowhere"  @click="add" class="btn btn-success">提交</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<div th:replace="include/admin/adminFooter::html" ></div>
+</body>
+</html>

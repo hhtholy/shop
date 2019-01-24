@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/admin/adminHeader::html('编辑产品')"></head>  <!--主要是引入js-->
+<body>
+<div th:replace="include/admin/adminNavigator::html"></div> <!--这是导航页-->
+<script>
+    $(function () {
+
+        //定义vue的数据域
+        var data4Vue = {
+            bean: {category: {}},
+            uri: "products",
+            category: {},
+            listURL: "admin_product_list"
+        };
+        var id = getUrlParms("id"); //地址栏上传递的参数是 id
+
+        //定义vue对象
+        var vue = new Vue({
+            el: "#workingArea",
+            data: data4Vue,
+            mounted: function () {
+                //vue对象加载成功后 也就是dom对象加载完毕后
+                this.get();
+            },
+            methods: {
+                //数据回显的作用
+                get: function () {
+                    var url = this.uri + "/" + id;
+                    axios.get(url).then(function (res) {
+                        vue.bean = res.data;
+                        vue.category = res.data.category;
+                    });
+                },
+                //数据已经回显
+                update: function () {
+                    if (!checkEmpty(this.bean.name, "产品名称"))
+                        return;
+                    var url = this.uri + "/" + this.bean.id;
+                    // 此时 bean已经都有值了  包括分类的信息 因为已经回显了
+                    axios.put(url, this.bean).then(function (res) {
+                        //重新展示这个分类下的所有属性
+                        location.href = vue.listURL + "?cid=" + res.data.category.id;
+                    });
+
+
+                }
+            }//方法前的结尾
+        });
+
+    });
+
+</script>
+<div id="workingArea">
+    <ol class="breadcrumb">
+        <li><a href="admin_category_list">所有分类</a></li>
+        <!--属性属于的分类-->
+        <li><a :href="'admin_product_list?cid='+category.id">{{category.name}}</a></li>
+        <li class="active">产品管理</li>
+    </ol>
+
+    <div class="panel panel-warning editDiv">
+        <div class="panel-heading">编辑产品</div>
+        <div class="panel-body">
+            <table class="editTable">
+                <tr>
+                    <td>产品名称</td>   <!--v-model实现 双向绑定 -->
+                    <td><input @keyup.enter="update" v-model.trim="bean.name" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>产品小标题</td>
+                    <td><input @keyup.enter="update" v-model.trim="bean.subTitle" type="text"
+                               class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>原价格</td>
+                    <td><input @keyup.enter="update" v-model.trim="bean.originalPrice" type="text"
+                               class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>优惠价格</td>
+                    <td><input @keyup.enter="update" v-model.trim="bean.promotePrice" type="text"
+                               class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>库存</td>
+                    <td><input @keyup.enter="update" v-model.trim="bean.stock" type="text"
+                               class="form-control"></td>
+                </tr>
+                <tr class="submitTR">
+                    <td colspan="2" align="center">
+                        <!--隐藏域   为了更新的时候 保留这个id 才能进行更新操作-->
+                        <input type="hidden" name="id" v-model.trim="bean.id">
+                        <a href="#nowhere" class="btn btn-success" @click="update">提 交</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<div th:replace="include/admin/adminFooter::html"></div>
+</body>
+</html>

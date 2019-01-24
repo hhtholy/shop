@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include/admin/adminHeader::html('分类管理')" ></head>  <!--主要是引入js-->
+<body>
+<div th:replace="include/admin/adminNavigator::html" ></div> <!--这是导航页-->
+<script>
+
+       $(function () {
+
+           //页面加载成功后
+           var cid = getUrlParms("cid"); //获取url地址栏上的 cid  也就是分类id
+
+           //定义数据域
+           var data4Vue = {
+               bean:{category:{id:""}},  //不设置Category的话 vue会报错
+               beans:[],
+               pagination:{},  //分页数据
+               category:{},
+               uri:"products"
+           };
+
+           //定义vue对象
+           var vue = new Vue({
+               el:"#workingArea",
+               data:data4Vue,
+               mounted:function () {
+                   this.list(0);  //页面加载完去 调用这个方法
+
+                   this.getCategory();
+               },
+               methods:{
+                   //面包屑导航
+                   getCategory:function () {
+                       var url = "categories/"+cid;
+                       axios.get(url).then(function (response) {
+                           vue.category = response.data;  //查询出分类的信息
+                       });
+
+                   },
+                   list:function (currentPage) {
+                      var url = "categories" +"/" + cid +"/" + this.uri +"?currentPage=" + currentPage;
+                      axios.get(url).then(function (res) {
+                          vue.pagination = res.data; //分页信息
+                          vue.beans = res.data.content; //分页信息里面的内容
+                      });
+                   },
+                   jump:function (page) {  //分页跳转
+                       jump(page,vue);
+                   },
+                   jumpByNumber:function (currentPage) {
+                       jumpByNumber(currentPage,vue);  //分页跳转
+                   },
+                   //添加产品
+                   add:function () {
+
+                       var url = this.uri;
+                       //bean其实 已经包含了一切值 除了cid
+                       this.bean.category.id = cid;
+
+                       axios.post(url,this.bean).then(function (res) {
+                           //添加成功后 刷新IE表
+                           vue.list(0);
+                           vue.bean = {};
+                       });
+
+                   },
+                   //删除 产品
+                   deleteBean:function (id) {
+                       if(!checkDeleteLink())
+                        return;
+
+                       var url = this.uri +　"/" +id;
+
+                       axios.delete(url).then(function (res) {
+                           if(res.data == "failure") {
+                               alert("删除失败~");
+                           }else{
+
+                               vue.list(0); //刷新界面
+
+                           }
+                       });
+
+                   }
+               }
+           });
+           
+       })
+    
+    
+</script>
+
+
+
+<div id="workingArea" >
+    <ol class="breadcrumb">
+        <li><a href="admin_category_list">所有分类</a></li>
+        <li><a :href="'admin_product_list?cid='+category.id">{{category.name}}</a></li>
+        <li class="active">产品管理</li>
+    </ol>
+
+    <div class="listDataTableDiv">
+        <table class="table table-striped table-bordered table-hover table-condensed">
+            <thead>
+            <tr class="success">
+                <th>ID</th>
+                <th>图片</th>
+                <th>产品名称</th>
+                <th>产品小标题</th>
+                <th width="53px">原价格</th>
+                <th width="80px">优惠价格</th>
+                <th width="80px">库存数量</th>
+
+                <th width="80px">图片管理</th>
+                <th width="80px">设置属性</th>
+                <th>编辑</th>
+                <th>删除</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!--遍历数据-->
+            <tr v-for="bean in beans ">
+                <td>{{bean.id}}</td>
+                <td>
+                <img v-if="null != bean.productImageId" :src="'img/productSingle/'+bean.productImageId+'.jpg'" width="40px"/>
+                </td>
+                <td>{{bean.name}}</td>
+                <td>{{bean.subTitle}}</td>
+                <td>{{bean.originalPrice}}</td>
+                <td>{{bean.promotePrice}}</td>
+                <td>{{bean.stock}}</td>
+
+                <td>  <!--产品图片管理-->
+                    <a :href="'admin_productImage_list?pid=' + bean.id "><span class="glyphicon glyphicon-picture"></span></a>
+                </td>
+                <td>
+                    <!--属性值的设定 -->
+                    <a :href="'admin_propertyValue_edit?pid=' + bean.id "><span class="glyphicon glyphicon-th-list"></span></a>
+                </td>
+
+                <td>
+                    <a :href="'admin_product_edit?id=' + bean.id "><span class="glyphicon glyphicon-edit"></span></a>
+                </td>
+                <td>
+                    <a href="#nowhere"  @click="deleteBean(bean.id)"><span class="   glyphicon glyphicon-trash"></span></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+<!--分页-->
+    <div th:replace="include/admin/adminPage::html"></div>
+
+    <!--添加产品-->
+    <div class="panel panel-warning addDiv">
+        <div class="panel-heading">新增产品</div>
+        <div class="panel-body">
+            <table class="panel-body">
+
+                <tr>
+                    <td>产品名称:</td>
+                     <td><input  @keyup.enter="add" v-model.trim="bean.name" type="text" class="form-control"/></td>
+                </tr>
+
+                <tr>
+                    <td>产品小标题:</td>
+                    <td><input  @keyup.enter="add" v-model.trim="bean.subTitle" type="text" class="form-control"/></td>
+                </tr>
+                <tr>
+                    <td>原价格</td>
+                    <td><input  @keyup.enter="add" v-model.trim="bean.originalPrice"  type="text"
+                                class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>优惠价格</td>
+                    <td><input  @keyup.enter="add" v-model.trim="bean.promotePrice" type="text"
+                                class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>库存</td>
+                    <td><input  @keyup.enter="add" v-model.trim="bean.stock"  type="text"
+                                class="form-control"></td>
+                </tr>
+     <!--提交-->
+                <tr class="submitTR">
+                    <td colspan="2" align="center">
+                        <a href="#nowhere"  @click="add" class="btn btn-success">提交</a>
+                    </td>
+                </tr>
+
+            </table>
+
+
+
+
+
+        </div>
+    </div>
+
+
+</div>
+</body>
+</html>
