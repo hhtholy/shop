@@ -1,13 +1,13 @@
 package com.mini.controller;
 
+import com.mini.Constant;
 import com.mini.entity.Order;
 import com.mini.service.OrderService;
 import com.mini.util.Page;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,5 +41,24 @@ public class OrderController {
 
         return result;
 
+    }
+
+    /**
+     * 订单数据的更新
+     * @param id
+     * @return
+     */
+    @PutMapping("/deliveryOrder/{id}")
+    public Order deliveryOrder(@PathVariable("id") Integer id){
+
+        //先查询出这个订单
+       Order order =   orderService.getOrderById(id);
+       order.setDeliveryDate(new Date());
+       order.setStatus(Constant.ORDER_WAITCONFIRM.getWord());
+
+       //进行数据更新 订单数据更新
+        orderService.updateOrder(order);
+
+        return order;
     }
 }

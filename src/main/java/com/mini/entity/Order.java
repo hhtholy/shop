@@ -1,5 +1,7 @@
 package com.mini.entity;
 
+import com.mini.Constant;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -175,16 +177,37 @@ public class Order {
     }
 
     public String getStatusDesc() {
+
+        String desc = "未知";
+
+        switch (Constant.getConstant(this.status)){
+            case ORDER_WAITDELIVERY:
+                desc = "待发货";
+                break;
+            case ORDER_WAITPAY:
+                desc="待支付";
+                break;
+            case ORDER_DELETE:
+                desc="订单删除";
+                break;
+            case ORDER_WAITREVIEW:
+                desc="订单待评价";
+                break;
+            case ORDER_WAITCONFIRM:
+                desc="待收货";
+                break;
+            case ORDER_FINISH:
+                desc ="订单完成";
+                break;
+            default:
+                desc="未知";
+        }
+        this.statusDesc = desc;
         return statusDesc;
     }
 
     public void setStatusDesc(String statusDesc) {
-        this.statusDesc = statusDesc;
+       this.statusDesc = statusDesc;
     }
-
-
-
-
-
 
 }

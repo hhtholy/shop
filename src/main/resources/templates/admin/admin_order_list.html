@@ -32,6 +32,16 @@
                       var id = order.id;
                       $("#orderItemsTR"+id).show();
 
+                  },
+                  //发货
+                  deliveryOrder:function (order,e) {
+                      var url = "deliveryOrder/" + order.id;
+
+                      axios.put(url).then(function (res) {
+                          //成功后 把这个发货按钮隐藏
+                          $(e.target).hide();
+
+                      });
                   }
 
 
@@ -95,9 +105,9 @@
                         {{bean.confirmDate | formatDateFilter}}
                     </td>
                     <td>
-                        <button @click="showOrderItems(bean )" class="orderPageCheckOrderItems btn btn-primary btn-xs">查看详情</button>
+                        <button @click="showOrderItems(bean)" class="orderPageCheckOrderItems btn btn-primary btn-xs">查看详情</button>
 
-                        <button v-if="bean.status=='waitDelivery'" @click="" class="btn btn-primary btn-xs">发货</button>
+                        <button v-if="bean.status=='waitDelivery'" @click="deliveryOrder(bean,$event)" class="btn btn-primary btn-xs">发货</button>
                     </td>
                 </tr>
                 <tr class="orderPageOrderItemTR"  :id="'orderItemsTR'+bean.id">

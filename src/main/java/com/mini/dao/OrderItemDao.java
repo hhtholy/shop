@@ -18,4 +18,8 @@ public interface OrderItemDao extends JpaRepository<OrderItem,Integer> {
        //根据订单去查订单项
     public List<OrderItem> findByOrderOrderById(Order order);
 
+       //根据产品去 查订单项
+       public List<OrderItem> findByProductOrderById(Product product);
+
+
 }

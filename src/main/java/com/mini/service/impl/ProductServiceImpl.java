@@ -3,9 +3,12 @@ package com.mini.service.impl;
 import com.mini.dao.CategoryDao;
 import com.mini.dao.ProductDao;
 import com.mini.entity.Category;
+import com.mini.entity.OrderItem;
 import com.mini.entity.Product;
 import com.mini.entity.Property;
+import com.mini.service.OrderItemService;
 import com.mini.service.ProductService;
+import com.mini.service.ReviewService;
 import com.mini.util.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -14,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,6 +27,14 @@ import java.util.Optional;
 @Service
 public class ProductServiceImpl implements ProductService {
 
+
+     //注入OrderItemService
+    @Autowired
+    private OrderItemService orderItemService;
+
+    //注入 ReviewService
+    @Autowired
+    private ReviewService reviewService;
 
 
     //注入dao
@@ -137,5 +149,56 @@ public class ProductServiceImpl implements ProductService {
             result = null;
         }
         return result;
+    }
+
+    /**
+     * 获取产品的销量
+     *
+     * 注意一点的是  需要获取销量的话  应该是所有的订单项中的数量累加  产品 * 数量 累加
+     * @param product
+     * @return
+     */
+    @Override
+    public Integer getSaleCount(Product product) {
+
+        //获取 订单项中 拥有该产品的所有订单项
+        List<OrderItem> results = orderItemService.getOrderItemByProduct(product);
+
+        int count = 0;
+        for (OrderItem item:results){
+             //首先确定是创建了订单的  同时是已经付款的
+            if(item.getOrder() != null && item.getOrder().getPayDate() != null){
+                    count += item.getNumber();
+            }
+
+        }
+        return count;
+    }
+
+    /**
+     * 为产品设置 评价数量和销量
+     * @param product
+     */
+    @Override
+    public void setReviewsAndSaleCount(Product product) {
+        Integer saleCount = getSaleCount(product);
+
+        //根据产品获取 评价数量
+        int reviewCount = reviewService.getReviewCount(product);
+
+        product.setReviewCount(reviewCount);
+        product.setSaleCount(saleCount);
+    }
+
+    /**
+     * 设置 产品的销量和评价数量
+     * @param products
+     */
+
+    @Override
+    public void setReviewsAndSaleCount(List<Product> products) {
+          for (Product p:products){
+              setReviewsAndSaleCount(p);
+          }
     }
 }

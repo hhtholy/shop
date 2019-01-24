@@ -24,5 +24,13 @@ public interface ProductService {
     //更新产品
     public Product updateProduct(Product product);
 
+    //获取该产品的销量
+
+    public Integer getSaleCount(Product product);
+
+
+    //为产品设置销量 和 评价数量
+    public void setReviewsAndSaleCount(Product product);
+    public void setReviewsAndSaleCount(List<Product> products);
 
 }

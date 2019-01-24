@@ -23,4 +23,8 @@ public interface OrderService {
     public void removeOrderForOrderItems(Order order);
 
     public void removeOrderForOrderItems(List<Order> order);
+    //获取订单数据  根据id
+    public Order getOrderById(Integer id);
+    //  订单数据的更新
+    public  void updateOrder(Order order);
 }

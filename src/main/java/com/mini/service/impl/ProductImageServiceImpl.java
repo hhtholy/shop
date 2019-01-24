@@ -85,7 +85,7 @@ import java.util.Optional;
     }
 
     /**
-     * 给产品设置图片
+     * 给产品设置图片  单图
      * @param product
      */
   @Override

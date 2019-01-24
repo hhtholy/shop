@@ -9,12 +9,14 @@ import com.mini.service.OrderService;
 import com.mini.service.ProductImageService;
 import com.mini.util.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author hht
@@ -119,5 +121,36 @@ public class OrderServiceImpl implements OrderService {
                  for (Order order:orders){
                      removeOrderForOrderItems(order);
                  }
+    }
+
+    /**
+     * 获取订单数据  根据id
+     * @param id
+     * @return
+     */
+
+    @Override
+    public Order getOrderById(Integer id) {
+        Order order = new Order();
+        order.setId(id);
+        Example<Order> example = Example.of(order);
+        Optional<Order> optional = orderDao.findOne(example);
+        Order result = null;
+        if(optional.isPresent()){
+            result = optional.get();
+        }
+        return result;
+    }
+
+    /**
+     * 更新订单数据
+     * @param order
+     */
+
+    @Override
+    public void updateOrder(Order order) {
+
+        orderDao.save(order);
+
     }
 }
