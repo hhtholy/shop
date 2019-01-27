@@ -1,5 +1,6 @@
 package com.mini.service;
 
+import com.mini.entity.Category;
 import com.mini.entity.Product;
 import com.mini.entity.ProductImage;
 import com.mini.util.Page;
@@ -32,5 +33,14 @@ public interface ProductService {
     //为产品设置销量 和 评价数量
     public void setReviewsAndSaleCount(Product product);
     public void setReviewsAndSaleCount(List<Product> products);
+
+    //给产品设置图片
+    public void setFirstImageForProduct(Product product);
+
+    public void setFirstImagesForProduct(List<Product> list);
+
+
+    //根据分类去查询  分类下的产品
+    public List<Product> getProductByCategory(Category category);
 
 }

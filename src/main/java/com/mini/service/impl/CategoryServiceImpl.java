@@ -2,7 +2,10 @@ package com.mini.service.impl;
 
 import com.mini.dao.CategoryDao;
 import com.mini.entity.Category;
+import com.mini.entity.Product;
 import com.mini.service.CategoryService;
+import com.mini.service.ProductImageService;
+import com.mini.service.ProductService;
 import com.mini.util.Page;
 import jdk.internal.org.objectweb.asm.tree.TryCatchBlockNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryDao categoryDao;
+
+    //注入ProductService
+    @Autowired
+    private ProductService productService;
 
     @Override
     public List<Category> getCategories() {
@@ -120,5 +127,39 @@ public class CategoryServiceImpl implements CategoryService {
             System.out.println("没有查询到值");
         }
         return result;
+    }
+
+    /**
+     *  给分类塞上 产品的值  一个分类下有多个产品
+     * @param category
+     */
+    @Override
+    public void setProductsForCategory(Category category) {
+        //注入productService  根据分类查询出产品
+        List<Product> products = productService.getProductByCategory(category);
+        category.setProducts(products);
+    }
+
+
+    /**
+     * 解决死循环问题  移除product中 Category的引用
+     * @param category
+     */
+
+    @Override
+    public void removeCategoryForProduct(Category category) {
+           //查询出改分类下的产品
+        //注入productService  根据分类查询出产品
+        List<Product> products = productService.getProductByCategory(category);
+        for (Product p:products){
+              p.setCategory(null);
+        }
+    }
+
+    @Override
+    public void removeCategoryForProduct(List<Category> categorys) {
+          for (Category c:categorys){
+              removeCategoryForProduct(c);
+          }
     }
 }

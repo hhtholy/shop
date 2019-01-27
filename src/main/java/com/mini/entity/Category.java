@@ -1,6 +1,7 @@
 package com.mini.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * @author hht
@@ -18,7 +19,18 @@ public class Category {
     private Integer id;
 
     @Column(name = "name")
-    private String name;
+    private String name; //分类的名称
+
+    @Transient
+    private List<Product> products;
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
 
     public Integer getId() {
         return id;

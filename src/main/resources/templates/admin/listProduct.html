@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 
-<head th:include="include/admin/adminHeader::html('分类管理')" ></head>  <!--主要是引入js-->
+<head th:include="include/admin/adminHeader::html('产品管理')" ></head>  <!--主要是引入js-->
 <body>
 <div th:replace="include/admin/adminNavigator::html" ></div> <!--这是导航页-->
 <script>
@@ -60,9 +60,9 @@
                        this.bean.category.id = cid;
 
                        axios.post(url,this.bean).then(function (res) {
-                           //添加成功后 刷新IE表
+                           //添加成功后
                            vue.list(0);
-                           vue.bean = {};
+                           vue.bean = {category:{id:""}};
                        });
 
                    },

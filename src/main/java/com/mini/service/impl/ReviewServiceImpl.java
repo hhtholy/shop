@@ -5,6 +5,7 @@ import com.mini.entity.Product;
 import com.mini.entity.Review;
 import com.mini.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @author hht
  * @create 2019-01-21 21:00
  */
+@Service
 public class ReviewServiceImpl implements ReviewService {
 
     //注入dao

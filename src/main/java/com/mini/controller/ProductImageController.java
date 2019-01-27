@@ -28,7 +28,6 @@ import java.util.List;
  */
 @RestController
 public class ProductImageController {
-
     //注入 Service
     @Autowired
     private ProductImageService productImageService;
@@ -96,7 +95,7 @@ public class ProductImageController {
              //获取到产品   因为需要根据 产品去查询 该产品下面的图
             Product product = productService.getProduct(pid);
             if(product != null && productImage.getType() != null){
-                return productImageService.listImages(product,productImage.getType());
+                return productImageService.getImagesByProduct(product,productImage.getType());
 
             }
             return new ArrayList<>();

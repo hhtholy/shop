@@ -1,5 +1,6 @@
 package com.mini.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ public class ProductImage {
 
     @ManyToOne
     @JoinColumn(name = "pid")
+    @JsonBackReference
     private Product product;
 
     private String type; //图片的类型  单个 或者多个详情

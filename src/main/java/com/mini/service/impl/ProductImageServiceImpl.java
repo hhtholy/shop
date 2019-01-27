@@ -59,7 +59,7 @@ import java.util.Optional;
      */
 
     @Override
-    public List<ProductImage> listImages(Product product, String type) {
+    public List<ProductImage> getImagesByProduct(Product product, String type) {
         return productImageDao.findByProductAndTypeOrderByIdDesc(product,type);
     }
 
@@ -82,32 +82,6 @@ import java.util.Optional;
         }
 
         return result;
-    }
-
-    /**
-     * 给产品设置图片  单图
-     * @param product
-     */
-  @Override
-    public void setFirstImageForProduct(Product product) {
-
-        //根据产品的去获取 单图 获取的是一个列表
-        List<ProductImage> productImages = listImages(product, Constant.SINGLEIMAGE.toString());
-
-        if(productImages != null && productImages.size() > 0){
-               product.setProductImageId(productImages.get(0).getId());
-        }
-    }
-
-    /**
-     * 给产品设置图片
-     * @param list
-     */
-     @Override
-    public void setFirstImagesForProduct(List<Product> list) {
-        for (Product product:list){
-            setFirstImageForProduct(product);
-        }
     }
 
 

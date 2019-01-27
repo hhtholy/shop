@@ -70,4 +70,33 @@ public class ForePageController {
         return "redirect:home";
     }
 
+
+    /**
+     * 跳转到产品的详情信息信息展示界面
+     */
+
+    @GetMapping("/foreproduct")
+    public String productShow(){
+        return "fore/product";
+    }
+
+    /**
+     * 跳转到 分类下对应产品的展示
+     * @return
+     */
+    @GetMapping("/forecategory")
+    public String categoryShow(){
+        return "fore/category";
+    }
+
+    /**
+     * 跳转到 搜索界面
+     * @return
+     */
+    @GetMapping("/foresearch")
+    public String search(){
+        return "fore/search";
+    }
+
+
 }

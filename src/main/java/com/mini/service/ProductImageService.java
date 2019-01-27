@@ -17,15 +17,10 @@ public interface ProductImageService {
     public String deleteProductImage(Integer id);
 
     //获取图片 根据产品id, 以及type
-    List<ProductImage> listImages(Product product, String type);
+    List<ProductImage> getImagesByProduct(Product product, String type);
 
     //获取图片  根据id
     public ProductImage getProductImage(Integer id);
 
-
-    //给产品设置图片
-    public void setFirstImageForProduct(Product product);
-
-    public void setFirstImagesForProduct(List<Product> list);
 
 }

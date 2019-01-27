@@ -47,7 +47,7 @@ public class CategoryController {
     public Page<Category> getCategories(@RequestParam(value = "currentPage", defaultValue="0") Integer currentPage,
                                         @RequestParam(value = "size", defaultValue="4") Integer size){
 
-         return categoryService.getCategoryPage(currentPage,size,3);
+         return categoryService.getCategoryPage(currentPage,size,5);
     }
 
     /**

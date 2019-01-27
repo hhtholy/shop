@@ -6,7 +6,7 @@ import com.mini.entity.OrderItem;
 import com.mini.entity.Product;
 import com.mini.service.OrderItemService;
 import com.mini.service.OrderService;
-import com.mini.service.ProductImageService;
+import com.mini.service.ProductService;
 import com.mini.util.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -31,10 +31,10 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderItemService orderItemService;
 
-    //注入productImageService
+    //productService
 
     @Autowired
-    private ProductImageService productImageService;
+    private ProductService productService;
 
     //注入OrderDao
     @Autowired
@@ -59,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
 
              totalnum += item.getNumber();
            //？
-            productImageService.setFirstImageForProduct(result);
+            productService.setFirstImageForProduct(result);
 
         }
           order.setTotal(total);

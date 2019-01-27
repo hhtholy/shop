@@ -40,7 +40,7 @@ public class ProductController {
         Page<Product> page = productService.getProductPage(id, currentPage, size, 2);
 
         //设置图片
-        productImageService.setFirstImagesForProduct(page.getContent());
+        productService.setFirstImagesForProduct(page.getContent());
         return page;
     }
 

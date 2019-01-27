@@ -1,12 +1,11 @@
 package com.mini.service.impl;
 
+import com.mini.Constant;
 import com.mini.dao.CategoryDao;
 import com.mini.dao.ProductDao;
-import com.mini.entity.Category;
-import com.mini.entity.OrderItem;
-import com.mini.entity.Product;
-import com.mini.entity.Property;
+import com.mini.entity.*;
 import com.mini.service.OrderItemService;
+import com.mini.service.ProductImageService;
 import com.mini.service.ProductService;
 import com.mini.service.ReviewService;
 import com.mini.util.Page;
@@ -35,6 +34,11 @@ public class ProductServiceImpl implements ProductService {
     //注入 ReviewService
     @Autowired
     private ReviewService reviewService;
+
+
+    //注入ProductService
+    @Autowired
+    private ProductImageService productImageService;
 
 
     //注入dao
@@ -163,7 +167,6 @@ public class ProductServiceImpl implements ProductService {
 
         //获取 订单项中 拥有该产品的所有订单项
         List<OrderItem> results = orderItemService.getOrderItemByProduct(product);
-
         int count = 0;
         for (OrderItem item:results){
              //首先确定是创建了订单的  同时是已经付款的
@@ -200,5 +203,42 @@ public class ProductServiceImpl implements ProductService {
           for (Product p:products){
               setReviewsAndSaleCount(p);
           }
+    }
+
+    /**
+     * 给产品设置图片  单图
+     * @param product
+     */
+    @Override
+    public void setFirstImageForProduct(Product product) {
+
+        //根据产品的去获取 单图 获取的是一个列表
+        List<ProductImage> productImages = productImageService.getImagesByProduct(product, Constant.SINGLEIMAGE.getWord());
+
+        if(productImages != null && productImages.size() > 0){
+            product.setProductImageId(productImages.get(0).getId());
+        }
+    }
+
+    /**
+     * 给产品设置图片
+     * @param list
+     */
+    @Override
+    public void setFirstImagesForProduct(List<Product> list) {
+        for (Product product:list){
+            setFirstImageForProduct(product);
+        }
+    }
+
+    /**
+     * 根据分类获取 该分类下的产品
+     * @param category
+     * @return
+     */
+
+    @Override
+    public List<Product> getProductByCategory(Category category) {
+        return productDao.findByCategory(category);
     }
 }
