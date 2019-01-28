@@ -3,6 +3,7 @@ package com.mini.service;
 import com.mini.entity.Category;
 import com.mini.entity.Product;
 import com.mini.entity.ProductImage;
+import com.mini.entity.User;
 import com.mini.util.Page;
 
 import java.util.List;
@@ -25,6 +26,11 @@ public interface ProductService {
     //更新产品
     public Product updateProduct(Product product);
 
+    //点击产品信息上的立即购买
+    public Integer buyitnow(Integer pid, Integer num, User user);
+
+
+
     //获取该产品的销量
 
     public Integer getSaleCount(Product product);
@@ -43,4 +49,6 @@ public interface ProductService {
     //根据分类去查询  分类下的产品
     public List<Product> getProductByCategory(Category category);
 
+    //根据关键词去查询出 产品结果
+     public Page<Product> search(String keyword,int currentPage, int size);
 }

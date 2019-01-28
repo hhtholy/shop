@@ -1,8 +1,10 @@
 package com.mini.foreController;
 
 import com.mini.Constant;
+import com.mini.controller.ProductController;
 import com.mini.entity.*;
 import com.mini.service.*;
+import com.mini.util.Page;
 import com.mini.util.Result;
 import com.mini.util.comparator.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -199,6 +201,48 @@ public class ForeRESTcontroller {
           }
              return category;
 
+      }
+
+    /**
+     * 根据关键字 去查询产品 显示出对应结果
+     * @param keyword
+     * @return
+     */
+
+    @GetMapping("/search")
+      public  Object search(@RequestParam("keyword") String keyword){
+
+        //查询结果
+        Page<Product> searchResult = productService.search(keyword, 0, 20);
+
+        List<Product> content = searchResult.getContent();
+
+        //设置产品的图片  单图显示
+        productService.setFirstImagesForProduct(content);
+
+        //设置 产品的 销量和评价数量
+        productService.setReviewsAndSaleCount(content);
+
+
+        return searchResult;
+      }
+
+    /**
+     * 立即购买  点击立即购买
+     * @param num
+     * @return
+     */
+    @GetMapping("/buyitnow")
+      public Object buyitnow(Integer pid,Integer num,HttpSession session){
+
+        //获取 用户的数据
+        User user = (User) session.getAttribute("user");
+
+        //
+        Integer buyitnow = productService.buyitnow(pid, num, user);
+
+
+        return buyitnow;
       }
 
 }

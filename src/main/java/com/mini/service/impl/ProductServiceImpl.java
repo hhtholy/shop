@@ -9,6 +9,7 @@ import com.mini.service.ProductImageService;
 import com.mini.service.ProductService;
 import com.mini.service.ReviewService;
 import com.mini.util.Page;
+import org.hibernate.engine.jdbc.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
@@ -156,6 +157,61 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
+     *   点击立即购买
+     * @param pid
+     * @param num
+     * @param user
+     * @return
+     */
+    @Override
+    public Integer buyitnow(Integer pid, Integer num, User user) {
+        //返回的结果
+        Integer result = null;
+
+        //首先 根据产品id 获取产品
+        Product productResult = getProduct(pid);
+
+        //根据 用户  获取用户所在的订单项
+        List<OrderItem> orderItemsByUser = orderItemService.getOrderItemsByUser(user);
+
+        //是否已经在订单项的判断
+        boolean flag = false;
+
+
+        //如果取得了数据的话
+        if(orderItemsByUser != null && orderItemsByUser.size() > 0){
+
+            //遍历订单项 数据  比对 现在立即购买的产品是不是 订单项中 已经存在了
+            ///存在的话 那么只需要数量 加1 即可
+            for (OrderItem item:orderItemsByUser){
+                if(item.getProduct().getId().equals(pid)){
+                      //订单项该商品的数量 加上现在添加上的数量即可   也就是num
+                    Integer number = item.getNumber();
+                     number = number + num;
+                     item.setNumber(number);
+                     //更新item的信息
+                    orderItemService.updateOrderItem(item);
+                    flag = true;
+                    result = item.getId();
+                }
+
+            }
+        }
+
+        //如果该用户并没有添加过该商品的话  那么创建新的订单项
+          if(!flag){
+              OrderItem item = new OrderItem();
+              item.setNumber(num);
+              item.setUser(user);
+              item.setProduct(productResult);
+              result = item.getId();
+
+          }
+
+        return result;
+    }
+
+    /**
      * 获取产品的销量
      *
      * 注意一点的是  需要获取销量的话  应该是所有的订单项中的数量累加  产品 * 数量 累加
@@ -241,4 +297,24 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getProductByCategory(Category category) {
         return productDao.findByCategory(category);
     }
+
+    /**
+     *  根据 关键字 去获取对应的产品 结果
+     * @param keyword
+     * @param currentPage
+     * @param size
+     * @return
+     */
+    @Override
+    public Page<Product> search(String keyword, int currentPage, int size) {
+
+         Pageable pageable =  new PageRequest(currentPage,size, Sort.Direction.DESC,"id");
+
+        org.springframework.data.domain.Page<Product> pageResult = productDao.findByNameLike("%" + keyword + "%", pageable);
+
+         return  new Page<>(pageResult,5);
+
+    }
+
+
 }

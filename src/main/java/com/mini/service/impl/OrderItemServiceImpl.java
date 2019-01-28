@@ -4,6 +4,7 @@ import com.mini.dao.OrderItemDao;
 import com.mini.entity.Order;
 import com.mini.entity.OrderItem;
 import com.mini.entity.Product;
+import com.mini.entity.User;
 import com.mini.service.OrderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,5 +44,27 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Override
     public List<OrderItem> getOrderItemByProduct(Product product) {
         return orderItemDao.findByProduct(product);
+    }
+
+
+    /**
+     *   根据用户去查询 对应的订单项
+     * @param user
+     * @return
+     */
+    @Override
+    public List<OrderItem> getOrderItemsByUser(User user) {
+        return orderItemDao.findByUserAndOrderIsNotNull(user);
+    }
+
+    /**
+     * 更新订单项的信息
+     * @param orderItem
+     */
+    @Override
+    public void updateOrderItem(OrderItem orderItem) {
+
+         orderItemDao.save(orderItem);
+
     }
 }
